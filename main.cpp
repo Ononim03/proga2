@@ -4,11 +4,12 @@
 using namespace std;
 
 // Константы
-const int MAX_NAME_LEN = 100; // Максимальная длина ФИО
+const int MAX_NAME_LEN = 50; // Максимальная длина ФИО
 const int DATE_LEN = 11; // Длина даты рождения в формате dd.mm.yyyy + '\0'
 const int MAX_BOOKS = 100; // Максимальное количество книг
 const int MAX_AUTHOR_LEN = 100; // Максимальная длина имени автора
 const int MAX_TITLE_LEN = 100; // Максимальная длина названия книги
+const int MAX_FULLNAMES = 1000; // Максимальное количество ФИО
 
 struct Applicant {
     char surname[MAX_NAME_LEN];
@@ -216,6 +217,39 @@ void task3() {
     cout << min_len << endl;
 }
 
+void task4() {
+    ifstream in("in4.txt");
+    char line[500];
+    in.getline(line, sizeof(line));
+    int pos = 0;
+    bool flag = false;
+    while (line[pos] != '\0') {
+        if (line[pos] == ')') {
+            break;
+        }
+        if (line[pos] == '(') {
+            flag = true;
+        } else if (flag) {
+            cout << line[pos];
+        }
+        pos++;
+    }
+}
+int task5() {
+    ifstream in("in5.txt");
+    char line[500];
+    in.getline(line, sizeof(line));
+    int pos = 0;
+    int count = 0;
+    while (line[pos + 2] != '\0') {
+        if (line[pos] == 'a' && line[pos + 1] == 'b' && line[pos + 2] == 'c') {
+            count++;
+        }
+        pos++;
+    }
+    return count;
+}
+
 struct Book {
     int code;
     char author[MAX_AUTHOR_LEN];
@@ -223,7 +257,8 @@ struct Book {
     int year;
     int shelf;
 };
-int readBooks(const char* filename, Book books[]) {
+
+int readBooks(const char *filename, Book books[]) {
     ifstream inFile(filename);
     if (!inFile) {
         cerr << "Ошибка открытия файла!" << endl;
@@ -275,6 +310,7 @@ int readBooks(const char* filename, Book books[]) {
     inFile.close();
     return count;
 }
+
 void findBookLocation(const Book books[], int count) {
     char author[MAX_AUTHOR_LEN];
     char title[MAX_TITLE_LEN];
@@ -297,6 +333,7 @@ void findBookLocation(const Book books[], int count) {
         cout << "Книга не найдена." << endl;
     }
 }
+
 void listBooksByAuthor(const Book books[], int count) {
     char author[MAX_AUTHOR_LEN];
     cout << "Введите автора: ";
@@ -306,9 +343,9 @@ void listBooksByAuthor(const Book books[], int count) {
     for (int i = 0; i < count; ++i) {
         if (strcmp(books[i].author, author) == 0) {
             cout << "Шифр: " << books[i].code
-                 << ", Название: " << books[i].title
-                 << ", Год издания: " << books[i].year
-                 << ", Стеллаж: " << books[i].shelf << endl;
+                    << ", Название: " << books[i].title
+                    << ", Год издания: " << books[i].year
+                    << ", Стеллаж: " << books[i].shelf << endl;
             found = true;
         }
     }
@@ -317,6 +354,7 @@ void listBooksByAuthor(const Book books[], int count) {
         cout << "Книги данного автора не найдены." << endl;
     }
 }
+
 void countBooksByYear(const Book books[], int count) {
     int year;
     cout << "Введите год издания: ";
@@ -331,6 +369,7 @@ void countBooksByYear(const Book books[], int count) {
 
     cout << "Число книг издания " << year << " года: " << bookCount << endl;
 }
+
 void task_first() {
     Book books[MAX_BOOKS];
     int count = readBooks("books.txt", books);
@@ -343,37 +382,134 @@ void task_first() {
     int choice;
     do {
         cout << "\nВыберите действие:\n"
-             << "1. Найти местоположение книги\n"
-             << "2. Вывести список книг автора\n"
-             << "3. Подсчитать число книг по году издания\n"
-             << "0. Выход\n"
-             << "Ваш выбор: ";
+                << "1. Найти местоположение книги\n"
+                << "2. Вывести список книг автора\n"
+                << "3. Подсчитать число книг по году издания\n"
+                << "0. Выход\n"
+                << "Ваш выбор: ";
         cin >> choice;
 
         switch (choice) {
             case 1:
                 findBookLocation(books, count);
-            break;
+                break;
             case 2:
                 listBooksByAuthor(books, count);
-            break;
+                break;
             case 3:
                 countBooksByYear(books, count);
-            break;
+                break;
             case 0:
                 cout << "Выход из программы." << endl;
-            break;
+                break;
             default:
                 cout << "Неверный выбор. Попробуйте снова." << endl;
         }
     } while (choice != 0);
 }
 
+struct FullName {
+    char surname[MAX_NAME_LEN];
+    char name[MAX_NAME_LEN];
+    char patronymic[MAX_NAME_LEN];
+};
+
+int readFullNames(FullName fullNames[]) {
+    ifstream inFile("fullnames.txt");
+    if (!inFile) {
+        cerr << "Ошибка открытия файла!" << endl;
+        return 0;
+    }
+
+    int count = 0;
+    char line[200];
+
+    while (inFile.getline(line, sizeof(line)) && count < MAX_FULLNAMES) {
+        int pos = 0;
+
+        int i = 0;
+        while (line[pos] != ' ') {
+            fullNames[count].surname[i++] = line[pos++];
+        }
+        fullNames[count].surname[i] = '\0';
+        pos++;
+
+        i = 0;
+        while (line[pos] != ' ') {
+            fullNames[count].name[i++] = line[pos++];
+        }
+        fullNames[count].name[i] = '\0';
+        pos++;
+
+        i = 0;
+        while (line[pos] != '\0') {
+            fullNames[count].patronymic[i++] = line[pos++];
+        }
+        fullNames[count].patronymic[i] = '\0';
+
+        count++;
+    }
+
+    inFile.close();
+    return count;
+}
+
+void writeFullNames(const FullName fullNames[], int count) {
+    ofstream outFile("outfullnames.txt");
+    if (!outFile) {
+        cerr << "Ошибка открытия файла!" << endl;
+        return;
+    }
+
+    for (int i = 0; i < count; ++i) {
+        outFile << fullNames[i].surname << " "
+                << fullNames[i].name << " "
+                << fullNames[i].patronymic << endl;
+    }
+
+    outFile.close();
+}
+
+bool compareFullNames(const FullName &a, const FullName &b) {
+    int cmpSurname = strcmp(a.surname, b.surname);
+    if (cmpSurname != 0) {
+        return cmpSurname < 0;
+    }
+    int cmpName = strcmp(a.name, b.name);
+    if (cmpName != 0) {
+        return cmpName < 0;
+    }
+    return strcmp(a.patronymic, b.patronymic) < 0;
+}
+
+void sortFullNames(FullName fullNames[], int count) {
+    for (int i = 0; i < count - 1; ++i) {
+        for (int j = 0; j < count - i - 1; ++j) {
+            if (!compareFullNames(fullNames[j], fullNames[j + 1])) {
+                swap(fullNames[j], fullNames[j + 1]);
+            }
+        }
+    }
+}
+
 void task_second() {
+    FullName fullNames[MAX_FULLNAMES];
+    int count = readFullNames(fullNames);
+
+    if (count == 0) {
+        cout << "Не удалось прочитать данные из файла." << endl;
+        return;
+    }
+
+    // Сортировка списка ФИО
+    sortFullNames(fullNames, count);
+
+    // Запись отсортированного списка в файл
+    writeFullNames(fullNames, count);
 }
 
 int main() {
     system("chcp 65001");
-    task_first();
+    cout << task5();
     return 0;
 }
