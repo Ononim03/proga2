@@ -1,6 +1,0 @@
-101 Tolstoy WarAndPeace 1869 5
-102 Dostoevsky CrimeAndPunishment 1866 3
-103 Tolstoy AnnaKarenina 1877 5
-104 Orwell 1984 1949 2
-105 Dostoevsky TheBrothersKaramazov 1880 3
-106 Orwell AnimalFarm 1945 2
